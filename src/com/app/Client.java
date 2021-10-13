@@ -6,6 +6,11 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 public class Client {
+    // Auth between client and server
+    // Server must store passwords in a file (hash(pwd))
+    // Session key -> Diffie Hellman?
+    // send hash(username, password)
+
     public Client() throws RemoteException {
     }
 
