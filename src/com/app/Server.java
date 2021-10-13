@@ -1,27 +1,21 @@
 package com.app;
 
-<<<<<<< HEAD
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-
-public class Server {
-    public static void main(String[] args) throws UnknownHostException, MalformedURLException, RemoteException {
-        System.setProperty("java.rmi.server.hostname","127.0.0.1");
-        InformationImpl informationImpl = new InformationImpl();
-        String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + "/TestRMI";
-        System.out.println("Enregistrement de l'objet avec l'url : " + url);
-        Naming.rebind(url, informationImpl);
-=======
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.rmi.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 public class Server implements PrintService {
-    public static void main(String[] args) {
->>>>>>> 93d7b1e23789545677c43e1f0cfb318fdc4eae02
+    public static void main(String[] args) throws UnknownHostException, MalformedURLException, RemoteException, AlreadyBoundException {
+        System.setProperty("java.rmi.server.hostname","127.0.0.1");
+        InformationImpl obj = new InformationImpl();
+        LocateRegistry.createRegistry(1099);
+        Registry registry = LocateRegistry.getRegistry();
+        registry.rebind("Hello", obj);
+
         System.out.println("Running server");
     }
 
