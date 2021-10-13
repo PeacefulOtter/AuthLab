@@ -35,17 +35,17 @@ public class Server implements PrintService {
     }
 
     @Override
-    public void start() throws RemoteException, AlreadyBoundException {
+    public void start() throws RemoteException {
 
     }
 
     @Override
-    public void stop() throws RemoteException, NotBoundException {
+    public void stop() throws RemoteException {
 
     }
 
     @Override
-    public void restart() throws RemoteException, NotBoundException, AlreadyBoundException {
+    public void restart() throws RemoteException {
 
     }
 
