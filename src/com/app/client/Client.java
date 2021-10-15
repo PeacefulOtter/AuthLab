@@ -1,6 +1,6 @@
 package com.app.client;
 
-import com.app.server.Information;
+import com.app.RemoteServer;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -14,15 +14,18 @@ public class Client {
     // Session key -> Diffie Hellman?
     // send hash(username, password)
 
-    public Client() throws RemoteException {
-    }
-
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException {
         String hostName = "127.0.0.1";
         Remote server =  Naming.lookup("rmi://" + hostName + "/Hello");
-        String response = ((Information)server).getInformation();
+        System.out.println("Running client");
+
+        String response = ((RemoteServer)server).start();
         System.out.println("response: " + response);
 
-        System.out.println("Running client");
+        response = ((RemoteServer)server).setConfig("param", "lol");
+        System.out.println("response: " + response);
+
+        response = ((RemoteServer)server).stop();
+        System.out.println("response: " + response);
     }
 }
