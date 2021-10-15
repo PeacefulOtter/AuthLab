@@ -1,8 +1,11 @@
-package com.app;
+package com.app.client;
+
+import com.app.server.Information;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public class Client {
@@ -16,8 +19,8 @@ public class Client {
 
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException {
         String hostName = "127.0.0.1";
-        Information stub = (Information) Naming.lookup("rmi://" + hostName + "/Hello");
-        String response = stub.getInformation();
+        Remote server =  Naming.lookup("rmi://" + hostName + "/Hello");
+        String response = ((Information)server).getInformation();
         System.out.println("response: " + response);
 
         System.out.println("Running client");
