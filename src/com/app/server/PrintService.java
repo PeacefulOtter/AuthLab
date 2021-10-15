@@ -7,11 +7,16 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class PrintService extends UnicastRemoteObject implements RemoteServer {
+public class PrintService extends UnicastRemoteObject implements RemoteServer
+{
     private static final long serialVersionUID = 2674880711467464646L;
 
-    protected PrintService() throws RemoteException {
+    private boolean CLIENT_AUTHENTICATED = false;
+
+    protected PrintService() throws RemoteException
+    {
         super();
+        System.out.println("print service creation");
     }
 
     /**
@@ -21,27 +26,36 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @param printer  is the name of the printer that should print
      * @throws RemoteException if error
      */
-    public void print(String fileName, String printer) throws RemoteException {
-        Logger.log("print", "fileName: " + fileName + ", Printer: " + printer);
+    @Override
+    public String print(String fileName, String printer) throws RemoteException
+    {
+        return Logger.log("print", "fileName: " + fileName + ", Printer: " + printer);
     }
+
     /**
      * lists the print queue for a given printer on the user's display in lines of the form <job number>   <file name>
      *
      * @param printer is the name of the printer that should print
      * @throws RemoteException if error
      */
-    public void queue(String printer) throws RemoteException {
-        Logger.log("queue", "Printer: " + printer);
+    @Override
+    public String queue(String printer) throws RemoteException
+    {
+        return Logger.log("queue", "Printer: " + printer);
     }
+
     /**
      * moves job to the top of the queue
      *
      * @param printer is the name of the printer that should print
      * @param job     job
      */
-    public void topQueue(String printer, int job) throws RemoteException {
-        Logger.log("topQueue", "Printer: " + printer + ", Job: " + job );
+    @Override
+    public String topQueue(String printer, int job) throws RemoteException
+    {
+        return Logger.log("topQueue", "Printer: " + printer + ", Job: " + job );
     }
+
     /**
      * starts the print server
      *
@@ -49,10 +63,11 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws AlreadyBoundException if error
      */
     @Override
-    public String start() throws RemoteException {
-        Logger.log("start");
-        return "start OK";
+    public String start() throws RemoteException
+    {
+        return Logger.log("start");
     }
+
     /**
      * stops the print server
      *
@@ -60,10 +75,11 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws NotBoundException if error
      */
     @Override
-    public String stop() throws RemoteException {
-        Logger.log("stop");
-        return "stop OK";
+    public String stop() throws RemoteException
+    {
+        return Logger.log("stop");
     }
+
     /**
      * stops the print server, clears the print queue and starts the print server again
      *
@@ -72,10 +88,11 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws AlreadyBoundException if error
      */
     @Override
-    public String restart() throws RemoteException {
-        Logger.log("restart");
-        return "restart OK";
+    public String restart() throws RemoteException
+    {
+        return Logger.log("restart");
     }
+
     /**
      * prints status of printer on the user's display
      *
@@ -84,10 +101,11 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws RemoteException if error
      */
     @Override
-    public String status(String printer) throws RemoteException {
-        Logger.log("status", "Printer: " + printer);
-        return "status {printer: " + printer + "} OK";
+    public String status(String printer) throws RemoteException
+    {
+        return Logger.log("status", "Printer: " + printer);
     }
+
     /**
      * prints the value of the parameter on the user's display
      *
@@ -96,10 +114,11 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws RemoteException if error
      */
     @Override
-    public String readConfig(String parameter) throws RemoteException {
-        Logger.log("readConfig", "Parameter: " + parameter);
-        return "readConfig {parameter: " + parameter + "} OK";
+    public String readConfig(String parameter) throws RemoteException
+    {
+        return Logger.log("readConfig", "Parameter: " + parameter);
     }
+
     /**
      * sets the parameter to value
      *
@@ -108,8 +127,8 @@ public class PrintService extends UnicastRemoteObject implements RemoteServer {
      * @throws RemoteException if error
      */
     @Override
-    public String setConfig(String parameter, String value) throws RemoteException {
-        Logger.log("setConfig", "Parameter: " + parameter + ", Value: " + value);
-        return "setConfig {parameter: " + parameter + ", value: " + value + "} OK";
+    public String setConfig(String parameter, String value) throws RemoteException
+    {
+        return Logger.log("setConfig", "Parameter: " + parameter + ", Value: " + value);
     }
 }

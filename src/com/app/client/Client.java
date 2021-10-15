@@ -9,6 +9,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public class Client {
+    private static final String username = "datasec";
+    private static final String password = "bad_pwd";
+
     // Auth between client and server
     // Server must store passwords in a file (hash(pwd))
     // Session key -> Diffie Hellman?
@@ -16,7 +19,7 @@ public class Client {
 
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException {
         String hostName = "127.0.0.1";
-        Remote server =  Naming.lookup("rmi://" + hostName + "/Hello");
+        Remote server = Naming.lookup("rmi://" + hostName + "/Hello");
         System.out.println("Running client");
 
         String response = ((RemoteServer)server).start();

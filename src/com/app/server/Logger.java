@@ -2,13 +2,15 @@ package com.app.server;
 
 public abstract class Logger
 {
-    public static void log(String tag)
+    public static String log(String tag)
     {
-        System.out.println("["+tag+"] ");
+        return log(tag, "");
     }
 
-    public static void log(String tag, String content)
+    public static String log(String tag, String content)
     {
-        System.out.println("["+tag+"] " + content);
+        String message = "[" + tag + "]" + content;
+        System.out.println(message);
+        return message;
     }
 }

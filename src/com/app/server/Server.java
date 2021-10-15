@@ -16,6 +16,5 @@ public class Server {
 
         Registry registry = LocateRegistry.getRegistry();
         registry.rebind("client", service);
-
     }
 }
