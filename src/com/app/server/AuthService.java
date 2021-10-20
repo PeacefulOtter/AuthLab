@@ -3,8 +3,11 @@ package com.app.server;
 import com.app.Logger;
 import com.app.PublicKeys;
 
+import java.io.*;
+
 public class AuthService
 {
+    private static final String DATABASE_FILE = "database.txt";
     private boolean clientAuthenticated = false;
     private int symKey;
 
@@ -24,13 +27,24 @@ public class AuthService
         return String.valueOf(publicNumber);
     }
 
-    public String register(String message)
+    public boolean register(String message)
     {
-        return Logger.log("register", message);
+        try ( FileOutputStream fos = new FileOutputStream("./res/" + DATABASE_FILE, true))
+        {
+            fos.write((message + "\n").getBytes());
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        Logger.log("Server", message);
+        return true;
     }
 
-    public String login(String message)
+    public boolean login(String message)
     {
-        return Logger.log("login", message);
+        Logger.log("login", message);
+        return true;
     }
 }

@@ -2,6 +2,7 @@ package com.app.server;
 
 import com.app.RemoteServer;
 
+import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -69,7 +70,7 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     }
 
     @Override
-    public String register(String message) throws RemoteException {
+    public boolean register(String message) throws RemoteException {
         return authService.register(message);
     }
 

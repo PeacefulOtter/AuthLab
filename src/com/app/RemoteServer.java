@@ -1,5 +1,6 @@
 package com.app;
 
+import java.io.FileNotFoundException;
 import java.rmi.*;
 
 public interface RemoteServer extends Remote
@@ -16,6 +17,6 @@ public interface RemoteServer extends Remote
 
     /* AUTH */
     String exchangePublicNumbers(String message) throws RemoteException;
-    String register(String message) throws RemoteException;
+    boolean register(String message) throws RemoteException;
     String login(String message) throws RemoteException;
 }
