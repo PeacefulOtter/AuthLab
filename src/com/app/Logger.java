@@ -1,4 +1,4 @@
-package com.app.server;
+package com.app;
 
 public abstract class Logger
 {
@@ -9,7 +9,7 @@ public abstract class Logger
 
     public static String log(String tag, String content)
     {
-        String message = "[" + tag + "]" + content;
+        String message = "[" + tag + "] " + content;
         System.out.println(message);
         return message;
     }

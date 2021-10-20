@@ -1,6 +1,9 @@
 package com.app.client;
 
+import com.app.PublicKeys;
 import com.app.RemoteServer;
+import com.app.Logger;
+import com.app.Settings;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -9,26 +12,40 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public class Client {
+    private static final int PRIVATE_KEY_RANGE = 10;
     private static final String username = "datasec";
     private static final String password = "bad_pwd";
 
+    private final RemoteServer server;
+
+    private Client( RemoteServer server )
+    {
+        this.server = server;
+        System.out.println("Running client");
+    }
+
     // Auth between client and server
     // Server must store passwords in a file (hash(pwd))
-    // Session key -> Diffie Hellman?
     // send hash(username, password)
-
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException {
-        String hostName = "127.0.0.1";
-        Remote server = Naming.lookup("rmi://" + hostName + "/Hello");
-        System.out.println("Running client");
+        Remote remote = Naming.lookup("rmi://" + Settings.HOSTNAME + "/" + Settings.SUBDOMAIN );
+        RemoteServer server = (RemoteServer) remote;
 
-        String response = ((RemoteServer)server).start();
-        System.out.println("response: " + response);
+        Client client = new Client(server);
+        int symKey = client.getSymKey();
+    }
 
-        response = ((RemoteServer)server).setConfig("param", "lol");
-        System.out.println("response: " + response);
 
-        response = ((RemoteServer)server).stop();
-        System.out.println("response: " + response);
+    private int getSymKey() throws RemoteException {
+        int privateKey = 4; // (int) Math.round(Math.random() * Settings.PRIVATE_KEY_RANGE);
+        Logger.log("Client", "Private key " + privateKey );
+        int publicNumber = (int) Math.pow(PublicKeys.GENERATOR.value, privateKey) % PublicKeys.PRIME.value;
+        Logger.log("Client", "Public number " + publicNumber );
+        String serverPublicNumber = server.exchangePublicNumbers(String.valueOf(publicNumber));
+        Logger.log("Server", "Public number " + serverPublicNumber );
+
+        int symKey = (int) Math.pow(Integer.parseInt( serverPublicNumber ), privateKey) % PublicKeys.PRIME.value;
+        Logger.log("Client", "Symmetric key " + symKey );
+        return symKey;
     }
 }
