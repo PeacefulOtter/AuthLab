@@ -1,70 +1,95 @@
 package com.app.server;
 
 import com.app.HashUtils;
+import com.app.Logger;
 import com.app.RemoteServer;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
 {
     private static final long serialVersionUID = 2674880711467464646L;
 
-    private final Set<String> clients; // stores the hash of the clients => hash(username+password)
+    private final Set<UUID> sessions; // keep track of the sessions
     private final PrintService printService;
     private final AuthService authService;
 
     public RemoteHandler() throws RemoteException {
         super();
-        clients = new HashSet<>();
+        sessions = new HashSet<>();
         printService = new PrintService();
         authService = new AuthService();
     }
 
+    private boolean isAuthenticated(UUID id)
+    {
+        return sessions.contains(id);
+    }
+
     @Override
-    public String print(String fileName, String printer) throws RemoteException {
+    public String print(UUID id, String username, String fileName, String printer) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.print(fileName, printer);
     }
 
     @Override
-    public String queue(String printer) throws RemoteException {
+    public String queue(UUID id, String username, String printer) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.queue(printer);
     }
 
     @Override
-    public String topQueue(String printer, int job) throws RemoteException {
+    public String topQueue(UUID id, String username, String printer, int job) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.topQueue(printer, job);
     }
 
     @Override
-    public String start() throws RemoteException {
+    public String start(UUID id, String username) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.start();
     }
 
     @Override
-    public String stop() throws RemoteException {
+    public String stop(UUID id, String username) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.stop();
     }
 
     @Override
-    public String restart() throws RemoteException {
+    public String restart(UUID id, String username) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.restart();
     }
 
     @Override
-    public String status(String printer) throws RemoteException {
+    public String status(UUID id, String username, String printer) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.status(printer);
     }
 
     @Override
-    public String readConfig(String parameter) throws RemoteException {
+    public String readConfig(UUID id, String username, String parameter) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.readConfig(parameter);
     }
 
     @Override
-    public String setConfig(String parameter, String value) throws RemoteException {
+    public String setConfig(UUID id, String username, String parameter, String value) throws RemoteException {
+        if ( !isAuthenticated(id) ) return null;
+        Logger.log("Username", username);
         return printService.setConfig(parameter, value);
     }
 
@@ -74,16 +99,15 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     }
 
     @Override
-    public boolean register(String username, String password) throws RemoteException {
-        String hash = HashUtils.getHash( username, password );
-        boolean registered = authService.register(username, password);
-        if ( registered )
-            clients.add( hash );
-        return registered;
+    public UUID register(String username, String password) throws RemoteException {
+        UUID id = authService.register(username, password);
+        if ( id != null )
+            sessions.add( id );
+        return id;
     }
 
     @Override
-    public boolean login(String username, String password) throws RemoteException {
+    public UUID login(String username, String password) throws RemoteException {
         return authService.login(username, password);
     }
 }

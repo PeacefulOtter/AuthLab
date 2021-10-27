@@ -41,11 +41,6 @@ public class HashUtils {
         return bytesToHex(hashBytes);
     }
 
-    public static String getHash( String username, String password )
-    {
-        return hashString( username + password );
-    }
-
     public static String getHash( String s )
     {
         return hashString( s );

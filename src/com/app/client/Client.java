@@ -10,10 +10,11 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 public class Client
 {
-    private static final String USERNAME = "lilil";
+    private static final String USERNAME = "zadzjidz";
     private static final String PASSWORD = "ijjijiji";
 
     private final RemoteServer server;
@@ -32,8 +33,9 @@ public class Client
         Client client = new Client(server);
         int symKey = client.getSymKey();
 
-        boolean registered = client.register();
-        boolean login = client.login();
+        UUID session = client.register();
+        UUID login = client.login();
+        server.print(session, USERNAME, "file.txt", "MyPrinter");
     }
 
 
@@ -51,15 +53,15 @@ public class Client
         return symKey;
     }
 
-    private boolean register() throws RemoteException {
+    private UUID register() throws RemoteException {
 
-        boolean response = server.register(USERNAME, PASSWORD);
-        Logger.log("Server", "Register: " + response );
-        return response;
+        UUID res = server.register(USERNAME, PASSWORD);
+        Logger.log("Server", "Register: " + res );
+        return res;
     }
 
-    private boolean login() throws RemoteException {
-        boolean res = server.login(USERNAME, PASSWORD);
+    private UUID login() throws RemoteException {
+        UUID res = server.login(USERNAME, PASSWORD);
         Logger.log("Server", "Login: " + res );
         return res;
     }

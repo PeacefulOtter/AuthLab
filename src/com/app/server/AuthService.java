@@ -5,6 +5,7 @@ import com.app.Logger;
 import com.app.PublicKeys;
 
 import java.io.*;
+import java.util.UUID;
 
 public class AuthService
 {
@@ -39,7 +40,7 @@ public class AuthService
                 String lineUserHash = split[0];
                 String salt = split[2];
                 String userHash = HashUtils.getHash( username + salt );
-                return userHash.equals(lineUserHash);
+                return userHash.contentEquals(lineUserHash);
             }).count();
         } catch (IOException e)
         {
@@ -61,9 +62,7 @@ public class AuthService
                 String hash = split[1];
                 String salt = split[2];
                 String userHash = HashUtils.getHash( username + password + salt );
-                System.out.println(hash);
-                System.out.println(userHash);
-                return userHash.equals(hash);
+                return userHash.contentEquals(hash);
             }).count();
         } catch (IOException e)
         {
@@ -74,29 +73,32 @@ public class AuthService
         return count > 0;
     }
 
-    public boolean register(String username, String password)
+    public UUID register(String username, String password)
     {
         if ( findUser( username ) )
-            return false;
+            return null;
 
         try ( FileOutputStream fos = new FileOutputStream("./res/" + DATABASE_FILE, true))
         {
             String hash = HashUtils.getFileHash( username, password );
+            Logger.log("Register", "username + password salted hash: " + hash );
             fos.write((hash + "\n").getBytes());
         } catch (IOException e)
         {
             e.printStackTrace();
-            return false;
+            return null;
         }
 
         Logger.log("Server", "Register completed" );
-        return true;
+        return UUID.randomUUID();
     }
 
-    public boolean login(String username, String password)
+    public UUID login(String username, String password)
     {
         boolean found = verifyUser( username, password );
         Logger.log("Server", "User exists? " + found);
-        return found;
+        if ( found )
+            return UUID.randomUUID();
+        return null;
     }
 }
