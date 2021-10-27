@@ -96,9 +96,12 @@ public class AuthService
     public UUID login(String username, String password)
     {
         boolean found = verifyUser( username, password );
-        Logger.log("Server", "User exists? " + found);
+        Logger.log("login", "Credentials OK? " + found);
         if ( found )
+        {
+            Logger.log( "login", "Creating session key");
             return UUID.randomUUID();
+        }
         return null;
     }
 }
