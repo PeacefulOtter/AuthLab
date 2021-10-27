@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class AuthService
 {
-    private static final String DATABASE_FILE = "public_credentials.txt";
+    private static final String DATABASE_FILE = "credentials.txt";
     private boolean clientAuthenticated = false;
     private int symKey;
 
@@ -39,7 +39,7 @@ public class AuthService
                 String[] split = line.split(" ");
                 String lineUserHash = split[0];
                 String salt = split[2];
-                String userHash = HashUtils.getHash( username + salt );
+                String userHash = HashUtils.getHash( username, salt );
                 return userHash.contentEquals(lineUserHash);
             }).count();
         } catch (IOException e)
@@ -59,10 +59,12 @@ public class AuthService
         {
             count = fis.lines().filter(line -> {
                 String[] split = line.split(" ");
-                String hash = split[1];
+                String lineUserHash = split[0];
+                String linePwdHash = split[1];
                 String salt = split[2];
-                String userHash = HashUtils.getHash( username + password + salt );
-                return userHash.contentEquals(hash);
+                String userHash = HashUtils.getHash( username, salt );
+                String pwdHash = HashUtils.getHash( password, salt );
+                return userHash.contentEquals(lineUserHash) && pwdHash.contentEquals(linePwdHash);
             }).count();
         } catch (IOException e)
         {

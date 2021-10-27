@@ -41,16 +41,16 @@ public class HashUtils {
         return bytesToHex(hashBytes);
     }
 
-    public static String getHash( String s )
+    public static String getHash( String s, String salt )
     {
-        return hashString( s );
+        return hashString( s + salt );
     }
 
     public static String getFileHash(String username, String password )
     {
         String salt = getNextSalt();
-        String userHash = getHash( username + salt );
-        String credentialsHash = getHash( username + password + salt );
+        String userHash = getHash( username, salt );
+        String credentialsHash = getHash( password, salt );
         return userHash + " " + credentialsHash + " " + salt;
     }
 
