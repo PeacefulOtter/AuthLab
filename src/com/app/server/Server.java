@@ -14,9 +14,9 @@ public class Server {
         LocateRegistry.createRegistry( Settings.PORT );
         RemoteHandler service = new RemoteHandler();
 
-        System.out.println("Running server");
-
         Registry registry = LocateRegistry.getRegistry();
         registry.rebind(Settings.SUBDOMAIN, service);
+
+        System.out.println("Running server");
     }
 }

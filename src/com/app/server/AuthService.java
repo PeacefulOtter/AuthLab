@@ -1,5 +1,6 @@
 package com.app.server;
 
+import com.app.HashUtils;
 import com.app.Logger;
 import com.app.PublicKeys;
 
@@ -7,7 +8,7 @@ import java.io.*;
 
 public class AuthService
 {
-    private static final String DATABASE_FILE = "database.txt";
+    private static final String DATABASE_FILE = "public_credentials.txt";
     private boolean clientAuthenticated = false;
     private int symKey;
 
@@ -27,13 +28,19 @@ public class AuthService
         return String.valueOf(publicNumber);
     }
 
-    private boolean findUser( String hash )
+    private boolean findUser( String username )
     {
         long count = 0;
 
         try ( BufferedReader fis = new BufferedReader( new FileReader( "./res/" + DATABASE_FILE ) ) )
         {
-            count = fis.lines().filter(hash::equals).count();
+            count = fis.lines().filter(line -> {
+                String[] split = line.split(" ");
+                String lineUserHash = split[0];
+                String salt = split[2];
+                String userHash = HashUtils.getHash( username + salt );
+                return userHash.equals(lineUserHash);
+            }).count();
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -43,16 +50,39 @@ public class AuthService
         return count > 0;
     }
 
-    public boolean register(String message)
+    private boolean verifyUser( String username, String password )
     {
-        // if user already is in the db, don't register it again
-        boolean found = findUser( message );
-        if ( found )
+        long count = 0;
+
+        try ( BufferedReader fis = new BufferedReader( new FileReader( "./res/" + DATABASE_FILE ) ) )
+        {
+            count = fis.lines().filter(line -> {
+                String[] split = line.split(" ");
+                String hash = split[1];
+                String salt = split[2];
+                String userHash = HashUtils.getHash( username + password + salt );
+                System.out.println(hash);
+                System.out.println(userHash);
+                return userHash.equals(hash);
+            }).count();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        return count > 0;
+    }
+
+    public boolean register(String username, String password)
+    {
+        if ( findUser( username ) )
             return false;
 
         try ( FileOutputStream fos = new FileOutputStream("./res/" + DATABASE_FILE, true))
         {
-            fos.write((message + "\n").getBytes());
+            String hash = HashUtils.getFileHash( username, password );
+            fos.write((hash + "\n").getBytes());
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -63,9 +93,9 @@ public class AuthService
         return true;
     }
 
-    public boolean login(String message)
+    public boolean login(String username, String password)
     {
-        boolean found = findUser( message );
+        boolean found = verifyUser( username, password );
         Logger.log("Server", "User exists? " + found);
         return found;
     }

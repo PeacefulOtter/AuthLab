@@ -1,19 +1,24 @@
 package com.app.server;
 
+import com.app.HashUtils;
 import com.app.RemoteServer;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
 {
     private static final long serialVersionUID = 2674880711467464646L;
 
+    private final Set<String> clients; // stores the hash of the clients => hash(username+password)
     private final PrintService printService;
     private final AuthService authService;
 
     public RemoteHandler() throws RemoteException {
         super();
+        clients = new HashSet<>();
         printService = new PrintService();
         authService = new AuthService();
     }
@@ -69,12 +74,16 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     }
 
     @Override
-    public boolean register(String message) throws RemoteException {
-        return authService.register(message);
+    public boolean register(String username, String password) throws RemoteException {
+        String hash = HashUtils.getHash( username, password );
+        boolean registered = authService.register(username, password);
+        if ( registered )
+            clients.add( hash );
+        return registered;
     }
 
     @Override
-    public boolean login(String message) throws RemoteException {
-        return authService.login(message);
+    public boolean login(String username, String password) throws RemoteException {
+        return authService.login(username, password);
     }
 }
