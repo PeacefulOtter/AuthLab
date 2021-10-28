@@ -49,9 +49,9 @@ public class HashUtils {
     public static String getFileHash(String username, String password )
     {
         String salt = getNextSalt();
-        String userHash = getHash( username, salt );
-        String credentialsHash = getHash( password, salt );
-        return userHash + " " + credentialsHash + " " + salt;
+        String usernameHash = getHash( username, salt );
+        String passwordHash = getHash( password, salt );
+        return usernameHash + " " + passwordHash + " " + salt;
     }
 
 }
