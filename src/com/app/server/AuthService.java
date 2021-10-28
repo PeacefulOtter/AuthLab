@@ -1,6 +1,5 @@
 package com.app.server;
 
-import com.app.HashUtils;
 import com.app.Logger;
 import com.app.PublicKeys;
 
@@ -98,10 +97,10 @@ public class AuthService
     public UUID login(String username, String password)
     {
         boolean found = verifyUser( username, password );
-        Logger.log("login", "Credentials OK? " + found);
+        Logger.log("Login", "Credentials OK? " + found);
         if ( found )
         {
-            Logger.log( "login", "Creating session key");
+            Logger.log( "Login", "Creating session key");
             return UUID.randomUUID();
         }
         return null;
