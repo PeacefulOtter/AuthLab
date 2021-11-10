@@ -4,7 +4,7 @@ import com.app.Logger;
 import com.app.PublicKeys;
 
 import java.io.*;
-import java.util.UUID;
+import java.util.*;
 
 public class AuthService
 {
@@ -74,10 +74,10 @@ public class AuthService
         return count > 0;
     }
 
-    public UUID register(String username, String password)
+    public boolean register(String username, String password)
     {
         if ( findUser( username ) )
-            return null;
+            return false;
 
         try ( FileOutputStream fos = new FileOutputStream("./res/" + DATABASE_FILE, true))
         {
@@ -87,21 +87,25 @@ public class AuthService
         } catch (IOException e)
         {
             e.printStackTrace();
-            return null;
+            return false;
         }
 
         Logger.log("Server", "Register completed" );
-        return UUID.randomUUID();
+        return true;
     }
 
-    public UUID login(String username, String password)
+
+
+    public Session login(String username, String password)
     {
         boolean found = verifyUser( username, password );
         Logger.log("Login", "Credentials OK? " + found);
         if ( found )
         {
             Logger.log( "Login", "Creating session key");
-            return UUID.randomUUID();
+            Set<String> permissions = Permissions.getPermissions(username);
+            Logger.log( "Login", "User " + username + " has permissions " + permissions);
+            return new Session(UUID.randomUUID(), permissions);
         }
         return null;
     }

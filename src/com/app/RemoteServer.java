@@ -17,6 +17,6 @@ public interface RemoteServer extends Remote
 
     /* AUTH */
     String establishSymKey(String message) throws RemoteException;
-    UUID register(String username, String password) throws RemoteException;
+    boolean register(String username, String password) throws RemoteException;
     UUID login(String username, String password) throws RemoteException;
 }

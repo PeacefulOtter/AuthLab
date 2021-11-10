@@ -5,34 +5,39 @@ import com.app.RemoteServer;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
 {
     private static final long serialVersionUID = 2674880711467464646L;
 
-    private final Set<UUID> sessions; // keep track of the sessions
+    private final Map<UUID, Set<String>> sessions; // keep track of the sessions
     private final PrintService printService;
     private final AuthService authService;
 
     public RemoteHandler() throws RemoteException {
         super();
-        sessions = new HashSet<>();
+        sessions = new HashMap<>();
         printService = new PrintService();
         authService = new AuthService();
     }
 
     private boolean isAuthenticated(UUID id)
     {
-        return sessions.contains(id);
+        return sessions.containsKey(id);
     }
 
     @Override
     public String print(UUID id, String username, String fileName, String printer) throws RemoteException {
         if ( !isAuthenticated(id) ) return null;
-        Logger.log("Username", username);
+
+        Set<String> permissions = sessions.get(id);
+        boolean hasAccess = permissions.contains("print");
+        if ( !hasAccess )
+            return "You do not have access to this method";
+
+        // if ( policy.allow print )
+        Logger.log("print", username);
         return printService.print(fileName, printer);
     }
 
@@ -98,15 +103,14 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     }
 
     @Override
-    public UUID register(String username, String password) throws RemoteException {
-        UUID id = authService.register(username, password);
-        if ( id != null )
-            sessions.add( id );
-        return id;
+    public boolean register(String username, String password) throws RemoteException {
+        return authService.register(username, password);
     }
 
     @Override
     public UUID login(String username, String password) throws RemoteException {
-        return authService.login(username, password);
+        Session session = authService.login(username, password);
+        sessions.put(session.getId(), session.getSessionPermissions());
+        return session.getId();
     }
 }

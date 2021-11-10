@@ -1,0 +1,3 @@
+alice manager
+bob janitor service-technician
+cecilia power-user

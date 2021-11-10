@@ -10,6 +10,7 @@ import java.rmi.registry.Registry;
 public class Server {
     public static void main(String[] args) throws RemoteException
     {
+        RoleBasedAccessControl.retrieveRoles();
         RemoteHandler service = new RemoteHandler();
 
         System.setProperty("java.rmi.server.hostname", Settings.HOSTNAME);
