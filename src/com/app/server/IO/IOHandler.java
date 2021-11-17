@@ -49,6 +49,30 @@ public class IOHandler
         return true;
     }
 
+    public static boolean readWriteReplace(String origin, String temp, String target, String replace )
+    {
+        File file = new File( "./res/" + origin );
+        File tempFile = new File( "./res/" + temp );
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile)) )
+        {
+            String currentLine;
+            while ((currentLine = reader.readLine()) != null)
+            {
+                String split[] = currentLine.split(" ");
+                if (split[0].contentEquals(target))
+                    writer.write( replace + System.getProperty("line.separator"));
+                else
+                    writer.write(currentLine + System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return tempFile.renameTo(file);
+    }
+
     public static boolean readWrite(String origin, String temp, String removePart)
     {
         File file = new File( "./res/" + origin );

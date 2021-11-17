@@ -1,3 +1,7 @@
 alice manager
 bob janitor service-technician
 cecilia power-user
+david user
+erica user
+fred user
+george user

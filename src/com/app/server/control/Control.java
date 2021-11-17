@@ -7,12 +7,13 @@ import java.util.Set;
 public interface Control
 {
     Set<String> getPermissions(String username );
-    boolean register( String username, Set<String> roles);
+    boolean changePermissions(String username, Set<String> rolesOrPerms);
+    boolean register( String username, Set<String> rolesOrPerms);
     boolean unregister( String username );
 
     default boolean addUser( String username, Set<String> roles, String file)
     {
-        return IOHandler.append( file, (line) -> username + " " + roles.toString() );
+        return IOHandler.append( file, (line) -> username + " " + roles.stream().reduce("", (a, b) -> a + " " + b) );
     }
 
     default boolean removeUser( String username, String origin, String temp )

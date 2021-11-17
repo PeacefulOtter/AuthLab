@@ -11,7 +11,7 @@ public class PrintService
      * @param printer  is the name of the printer that should print
      */
     public String print(String fileName, String printer) {
-        return Logger.log("print", "fileName: " + fileName + ", Printer: " + printer);
+        return Logger.log("PrintServer - print", "fileName: " + fileName + ", Printer: " + printer);
     }
 
     /**
@@ -20,7 +20,7 @@ public class PrintService
      * @param printer is the name of the printer that should print
      */
     public String queue(String printer) {
-        return Logger.log("queue", "Printer: " + printer);
+        return Logger.log("PrintServer - queue", "Printer: " + printer);
     }
 
     /**
@@ -29,8 +29,9 @@ public class PrintService
      * @param printer is the name of the printer that should print
      * @param job     job
      */
-    public String topQueue(String printer, int job) {
-        return Logger.log("topQueue", "Printer: " + printer + ", Job: " + job );
+    public String topQueue(String printer, int job)
+    {
+        return Logger.log("PrintServer - topQueue", "Printer: " + printer + ", Job: " + job );
     }
 
     /**
@@ -39,7 +40,7 @@ public class PrintService
      */
     public String start()
     {
-        return Logger.log("start");
+        return Logger.log("PrintServer - start");
     }
 
     /**
@@ -48,7 +49,7 @@ public class PrintService
      */
     public String stop()
     {
-        return Logger.log("stop");
+        return Logger.log("PrintServer - stop");
     }
 
     /**
@@ -56,7 +57,7 @@ public class PrintService
      */
     public String restart()
     {
-        return Logger.log("restart");
+        return Logger.log("PrintServer - restart");
     }
 
     /**
@@ -66,7 +67,7 @@ public class PrintService
      * @return status of printer on the user's display
      */
     public String status(String printer) {
-        return Logger.log("status", "Printer: " + printer);
+        return Logger.log("PrintServer - status", "Printer: " + printer);
     }
 
     /**
@@ -77,7 +78,7 @@ public class PrintService
      */
     public String readConfig(String parameter)
     {
-        return Logger.log("readConfig", "Parameter: " + parameter);
+        return Logger.log("PrintServer - readConfig", "Parameter: " + parameter);
     }
 
     /**
@@ -88,6 +89,6 @@ public class PrintService
      */
     public String setConfig(String parameter, String value)
     {
-        return Logger.log("setConfig", "Parameter: " + parameter + ", Value: " + value);
+        return Logger.log("PrintServer - setConfig", "Parameter: " + parameter + ", Value: " + value);
     }
 }

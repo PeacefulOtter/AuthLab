@@ -110,8 +110,12 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
         return session.getId();
     }
 
-    public boolean register(String username, String password, Set<String> roles) throws RemoteException {
-        return authService.register(username, password, roles);
+    public boolean changePermissions( String username, Set<String> rolesOrPerms ) {
+        return authService.changePermissions(username, rolesOrPerms);
+    }
+
+    public boolean register(String username, String password, Set<String> rolesOrPerms) {
+        return authService.register(username, password, rolesOrPerms);
     }
 
     public boolean unregister(String username) throws RemoteException {

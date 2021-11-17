@@ -67,20 +67,28 @@ public class AuthService
         return count > 0;
     }
 
-    public boolean register(String username, String password, Set<String> roles)
+    public boolean changePermissions(String username, Set<String> rolesOrPerms) {
+        // if ( !findUser( username ) )
+        //     return false;
+
+        Logger.log("AuthService - changePermissions", "Changing perms of " + username + " to roles / permissions " + rolesOrPerms.toString() );
+        return controlPolicy.changePermissions(username, rolesOrPerms);
+    }
+
+    public boolean register(String username, String password, Set<String> rolesOrPerms)
     {
         if ( findUser( username ) )
             return false;
 
         // Adding the user to the credentials
-        Logger.log("AuthService - Register", "Registering " + username + " with roles " + roles.toString() );
-        IOHandler.append( DATABASE_FILE, (line) -> {
+        Logger.log("AuthService - Register", "Registering " + username + " with roles / permissions " + rolesOrPerms.toString() );
+        IOHandler.append( DATABASE_FILE_CHANGED, (line) -> {
             String hash = HashUtils.getFileHash( username, password );
             Logger.log("AuthService - Register", "username + password salted hash: " + hash );
             return hash;
         });
         // now adding it to the access control - we let the policy handle it
-        return controlPolicy.register( username, roles );
+        return controlPolicy.register( username, rolesOrPerms );
     }
 
     public boolean unregister( String username )

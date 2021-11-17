@@ -1,3 +1,4 @@
 alice start stop restart print queue topQueue status readConfig setConfig
-bob print queue topQueue restart start stop status readConfig setConfig
 cecilia print queue topQueue restart
+henry  print queue
+ida  print restart topQueue queue
