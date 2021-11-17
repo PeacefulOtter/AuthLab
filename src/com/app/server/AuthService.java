@@ -2,6 +2,8 @@ package com.app.server;
 
 import com.app.Logger;
 import com.app.PublicKeys;
+import com.app.server.IO.IOHandler;
+import com.app.server.control.Control;
 
 import java.io.*;
 import java.util.*;
@@ -9,9 +11,18 @@ import java.util.*;
 public class AuthService
 {
     private static final String DATABASE_FILE = "credentials.txt";
-    private boolean clientAuthenticated = false;
-    private int symKey;
+    private static final String DATABASE_FILE_CHANGED = "credentials_Changed.txt";
+    private static final String DATABASE_FILE_TEMP = "credentials_Temp.txt";
 
+    private final Control controlPolicy;
+    private int symKey; /* UNUSED: for DIFFIE-HELLMAN */
+
+    protected AuthService(Control control)
+    {
+        this.controlPolicy = control;
+    }
+
+    /* UNUSED */
     public String establishSymKey(String message)
     {
         int clientPublicNumber = Integer.parseInt(message);
@@ -30,81 +41,70 @@ public class AuthService
 
     private boolean findUser( String username )
     {
-        long count = 0;
-
-        try ( BufferedReader fis = new BufferedReader( new FileReader( "./res/" + DATABASE_FILE ) ) )
-        {
-            count = fis.lines().filter(line -> {
-                String[] split = line.split(" ");
-                String lineUserHash = split[0];
-                String salt = split[2];
-                String userHash = HashUtils.getHash( username, salt );
-                return userHash.contentEquals(lineUserHash);
-            }).count();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+        int count = IOHandler.intRead( DATABASE_FILE, (reader) -> (int) reader.lines().filter(line -> {
+            String[] split = line.split(" ");
+            String lineUserHash = split[0];
+            String salt = split[2];
+            String userHash = HashUtils.getHash( username, salt );
+            return userHash.contentEquals(lineUserHash);
+        }).count());
 
         return count > 0;
     }
 
     private boolean verifyUser( String username, String password )
     {
-        long count = 0;
-
-        try ( BufferedReader fis = new BufferedReader( new FileReader( "./res/" + DATABASE_FILE ) ) )
-        {
-            count = fis.lines().filter(line -> {
-                String[] split = line.split(" ");
-                String lineUserHash = split[0];
-                String linePwdHash = split[1];
-                String salt = split[2];
-                String userHash = HashUtils.getHash( username, salt );
-                String pwdHash = HashUtils.getHash( password, salt );
-                return userHash.contentEquals(lineUserHash) && pwdHash.contentEquals(linePwdHash);
-            }).count();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+        int count = IOHandler.intRead( DATABASE_FILE, (reader) -> (int) reader.lines().filter(line -> {
+            String[] split = line.split(" ");
+            String lineUserHash = split[0];
+            String linePwdHash = split[1];
+            String salt = split[2];
+            String userHash = HashUtils.getHash( username, salt );
+            String pwdHash = HashUtils.getHash( password, salt );
+            return userHash.contentEquals(lineUserHash) && pwdHash.contentEquals(linePwdHash);
+        }).count());
 
         return count > 0;
     }
 
-    public boolean register(String username, String password)
+    public boolean register(String username, String password, Set<String> roles)
     {
         if ( findUser( username ) )
             return false;
 
-        try ( FileOutputStream fos = new FileOutputStream("./res/" + DATABASE_FILE, true))
-        {
+        // Adding the user to the credentials
+        Logger.log("AuthService - Register", "Registering " + username + " with roles " + roles.toString() );
+        IOHandler.append( DATABASE_FILE, (line) -> {
             String hash = HashUtils.getFileHash( username, password );
-            Logger.log("Register", "username + password salted hash: " + hash );
-            fos.write((hash + "\n").getBytes());
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-
-        Logger.log("Server", "Register completed" );
-        return true;
+            Logger.log("AuthService - Register", "username + password salted hash: " + hash );
+            return hash;
+        });
+        // now adding it to the access control - we let the policy handle it
+        return controlPolicy.register( username, roles );
     }
 
+    public boolean unregister( String username )
+    {
+        if ( findUser(username) )
+            return false;
+
+        Logger.log("AuthService - Unregister", "Unregistering " + username );
+        // remove from credentials
+        boolean removedCredentials = IOHandler.readWrite( DATABASE_FILE_CHANGED, DATABASE_FILE_TEMP, username );
+        // remove from access control - we let the policy handle it
+        return removedCredentials && controlPolicy.unregister( username );
+    }
 
 
     public Session login(String username, String password)
     {
         boolean found = verifyUser( username, password );
-        Logger.log("Login", "Credentials OK? " + found);
+        Logger.log("AuthService - Login", "Credentials OK? " + found);
         if ( found )
         {
-            Logger.log( "Login", "Creating session key");
-            Set<String> permissions = Permissions.getPermissions(username);
-            Logger.log( "Login", "User " + username + " has permissions " + permissions);
+            Logger.log( "AuthService - Login", "Creating session key");
+            Set<String> permissions = controlPolicy.getPermissions(username);
+            Logger.log( "AuthService - Login", "User " + username + " has permissions " + permissions);
             return new Session(UUID.randomUUID(), permissions);
         }
         return null;

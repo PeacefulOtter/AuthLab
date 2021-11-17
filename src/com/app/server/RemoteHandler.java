@@ -2,6 +2,7 @@ package com.app.server;
 
 import com.app.Logger;
 import com.app.RemoteServer;
+import com.app.server.control.Control;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -15,11 +16,11 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     private final PrintService printService;
     private final AuthService authService;
 
-    public RemoteHandler() throws RemoteException {
+    public RemoteHandler(Control control) throws RemoteException {
         super();
         sessions = new HashMap<>();
         printService = new PrintService();
-        authService = new AuthService();
+        authService = new AuthService(control);
     }
 
     private boolean isAuthenticated(UUID id)
@@ -103,14 +104,17 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     }
 
     @Override
-    public boolean register(String username, String password) throws RemoteException {
-        return authService.register(username, password);
-    }
-
-    @Override
     public UUID login(String username, String password) throws RemoteException {
         Session session = authService.login(username, password);
         sessions.put(session.getId(), session.getSessionPermissions());
         return session.getId();
+    }
+
+    public boolean register(String username, String password, Set<String> roles) throws RemoteException {
+        return authService.register(username, password, roles);
+    }
+
+    public boolean unregister(String username) throws RemoteException {
+        return authService.unregister(username);
     }
 }

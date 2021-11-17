@@ -14,8 +14,9 @@ import java.util.UUID;
 
 public class Client
 {
-    private static final String USERNAME = "alice";
-    private static final String PASSWORD = "ijjijiji";
+    //: args
+    // TODO: show role when login
+    // TODO: register / unregister
 
     private final RemoteServer server;
 
@@ -33,13 +34,16 @@ public class Client
         Client client = new Client(server);
         // int symKey = client.getSymKey(); // create diffie-hellman symmetric key
 
-        boolean registered = client.register();
-        UUID sessionID = client.login();
+        String username = args[0];
+        String password = args[1];
+        System.out.println(username);
+        System.out.println(password);
+        UUID sessionID = client.login(username, password);
 
-        server.print(sessionID, USERNAME, "file.txt", "MyPrinter");
+        server.print(sessionID, username, "file.txt", "MyPrinter");
     }
 
-
+    // DIFFIE HELLMAN KEY GENERATION
     private int getSymKey() throws RemoteException
     {
         int privateKey = 4; // (int) Math.round(Math.random() * Settings.PRIVATE_KEY_RANGE);
@@ -54,16 +58,9 @@ public class Client
         return symKey;
     }
 
-    private boolean register() throws RemoteException
+    private UUID login(String username, String password) throws RemoteException
     {
-        boolean res = server.register(USERNAME, PASSWORD);
-        Logger.log("Register", "Registered: " + res );
-        return res;
-    }
-
-    private UUID login() throws RemoteException
-    {
-        UUID res = server.login(USERNAME, PASSWORD);
+        UUID res = server.login(username, password);
         Logger.log("Login", "UUID: " + res );
         return res;
     }
