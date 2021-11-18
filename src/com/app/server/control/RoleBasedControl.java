@@ -37,7 +37,7 @@ public class RoleBasedControl implements Control {
     @Override
     public boolean changePermissions(String username, Set<String> rolesOrPerms)
     {
-        return IOHandler.readWriteReplace( ROLES_CONTROL_CHANGED, ROLES_CONTROL_TEMP, username, username + " " + rolesOrPerms.stream().reduce("", (a, b) -> a + " " + b) );
+        return IOHandler.readWriteReplace( ROLES_CONTROL_CHANGED, ROLES_CONTROL_TEMP, username, username + " " + rolesOrPerms.stream().reduce("", (a, b) -> b + " " + a) );
     }
 
 

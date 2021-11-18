@@ -1,5 +1,5 @@
 alice manager
-bob janitor service-technician
+bob service-technician
 cecilia power-user
 david user
 erica user

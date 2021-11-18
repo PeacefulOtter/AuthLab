@@ -1,8 +1,6 @@
 alice manager
-cecilia power-user
-david user
-erica user
-fred user
-george  service-technician
-henry  user
-ida  power-user
+cecilia power-user 
+david user 
+erica user 
+fred user 
+george service-technician 

@@ -1,3 +1,7 @@
 alice start stop restart print queue topQueue status readConfig setConfig
 bob print queue topQueue restart start stop status readConfig setConfig
 cecilia print queue topQueue restart
+david print queue
+erica print queue
+fred print queue
+george print queue

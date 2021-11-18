@@ -41,7 +41,7 @@ public class AuthService
 
     private boolean findUser( String username )
     {
-        int count = IOHandler.intRead( DATABASE_FILE, (reader) -> (int) reader.lines().filter(line -> {
+        int count = IOHandler.intRead( DATABASE_FILE_CHANGED, (reader) -> (int) reader.lines().filter(line -> {
             String[] split = line.split(" ");
             String lineUserHash = split[0];
             String salt = split[2];
@@ -54,7 +54,7 @@ public class AuthService
 
     private boolean verifyUser( String username, String password )
     {
-        int count = IOHandler.intRead( DATABASE_FILE, (reader) -> (int) reader.lines().filter(line -> {
+        int count = IOHandler.intRead( DATABASE_FILE_CHANGED, (reader) -> (int) reader.lines().filter(line -> {
             String[] split = line.split(" ");
             String lineUserHash = split[0];
             String linePwdHash = split[1];
@@ -67,33 +67,36 @@ public class AuthService
         return count > 0;
     }
 
-    public boolean changePermissions(String username, Set<String> rolesOrPerms) {
-        // if ( !findUser( username ) )
-        //     return false;
-
-        Logger.log("AuthService - changePermissions", "Changing perms of " + username + " to roles / permissions " + rolesOrPerms.toString() );
-        return controlPolicy.changePermissions(username, rolesOrPerms);
-    }
-
-    public boolean register(String username, String password, Set<String> rolesOrPerms)
-    {
-        if ( findUser( username ) )
+    public boolean changePermissions(String username, String[] rolesOrPerms) {
+        if ( !findUser( username ) )
             return false;
 
+        Set<String> ropSet = new HashSet<>(Arrays.asList(rolesOrPerms));
+        Logger.log("AuthService - changePermissions", "Changing perms of " + username + " to roles / permissions " + ropSet );
+        return controlPolicy.changePermissions(username, ropSet);
+    }
+
+    public boolean register(String username, String password, String[] rolesOrPerms)
+    {
+        // if ( findUser( username ) )
+        //    return false;
+
         // Adding the user to the credentials
-        Logger.log("AuthService - Register", "Registering " + username + " with roles / permissions " + rolesOrPerms.toString() );
-        IOHandler.append( DATABASE_FILE_CHANGED, (line) -> {
-            String hash = HashUtils.getFileHash( username, password );
-            Logger.log("AuthService - Register", "username + password salted hash: " + hash );
-            return hash;
-        });
+        Set<String> ropSet = new HashSet<>(Arrays.asList(rolesOrPerms));
+        Logger.log("AuthService - Register", "Registering " + username + " with roles / permissions " + ropSet );
+
+        //IOHandler.append( DATABASE_FILE_CHANGED, (line) -> {
+        //    String hash = HashUtils.getFileHash(username, password);
+        //    return hash;
+        //});
+
         // now adding it to the access control - we let the policy handle it
-        return controlPolicy.register( username, rolesOrPerms );
+        return controlPolicy.register( username, ropSet );
     }
 
     public boolean unregister( String username )
     {
-        if ( findUser(username) )
+        if ( !findUser(username) )
             return false;
 
         Logger.log("AuthService - Unregister", "Unregistering " + username );
@@ -106,15 +109,12 @@ public class AuthService
 
     public Session login(String username, String password)
     {
-        boolean found = verifyUser( username, password );
-        Logger.log("AuthService - Login", "Credentials OK? " + found);
-        if ( found )
-        {
-            Logger.log( "AuthService - Login", "Creating session key");
-            Set<String> permissions = controlPolicy.getPermissions(username);
-            Logger.log( "AuthService - Login", "User " + username + " has permissions " + permissions);
-            return new Session(UUID.randomUUID(), permissions);
-        }
-        return null;
+        if ( !verifyUser( username, password ) )
+            return null;
+
+        Logger.log( "AuthService - Login", "Creating session key");
+        Set<String> permissions = controlPolicy.getPermissions(username);
+        Logger.log( "AuthService - Login", "User " + username + " has permissions " + permissions);
+        return new Session(UUID.randomUUID(), permissions);
     }
 }

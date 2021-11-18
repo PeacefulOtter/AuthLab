@@ -31,7 +31,7 @@ public class AccessBasedControl implements Control {
 
     @Override
     public boolean changePermissions(String username, Set<String> rolesOrPerms) {
-        return IOHandler.readWriteReplace(ACCESS_CONTROL_CHANGED, ACCESS_CONTROL_TEMP, username, username + " " + rolesOrPerms.stream().reduce( "", (a, b) -> a + " " + b) );
+        return IOHandler.readWriteReplace(ACCESS_CONTROL_CHANGED, ACCESS_CONTROL_TEMP, username, username + " " + rolesOrPerms.stream().reduce( "", (a, b) -> b + " " + a) );
     }
 
     @Override
