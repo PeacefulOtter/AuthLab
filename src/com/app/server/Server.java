@@ -23,7 +23,7 @@ public class Server {
 
     public static void main(String[] args) throws RemoteException
     {
-        Control controlPolicy = new RoleBasedControl(); // new RoleBasedControl();
+        Control controlPolicy = new AccessBasedControl();
         RemoteHandler service = new RemoteHandler(controlPolicy);
 
         System.setProperty("java.rmi.server.hostname", Settings.HOSTNAME);
@@ -34,15 +34,15 @@ public class Server {
 
         /* FOR ROLE BASED ACCESS CONTROL*/
         // String[] alicePerms = "manager".split( " " );
-        String[] bobPerms = "service-technician".split(" ");
-        String[] ceciliaPerms = "power-user".split(" ");
-        String[] userPerms = "user".split(" ");
+        //String[] bobPerms = "service-technician".split(" ");
+        //String[] ceciliaPerms = "power-user".split(" ");
+        //String[] userPerms = "user".split(" ");
 
         /* FOR ACCESS BASED CONTROL*/
-        // String[] alicePerms = "start stop restart print queue topQueue status readConfig setConfig".split( " " );
-        // String[] bobPerms = "start stop restart status readConfig setConfig".split(" ");
-        // String[] ceciliaPerms = "print queue topQueue restart".split(" ");
-        // String[] userPerms = "print queue".split(" ");
+         String[] alicePerms = "start stop restart print queue topQueue status readConfig setConfig".split( " " );
+         String[] bobPerms = "start stop restart status readConfig setConfig".split(" ");
+         String[] ceciliaPerms = "print queue topQueue restart".split(" ");
+         String[] userPerms = "print queue".split(" ");
 
         // bob leaves
         boolean a = service.unregister("bob");

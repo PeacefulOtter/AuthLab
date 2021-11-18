@@ -40,7 +40,7 @@ public class Client
         System.out.println(password);
         UUID sessionID = client.login(username, password);
 
-        server.print(sessionID, username, "file.txt", "MyPrinter");
+        server.queue(sessionID, username,"myPrinter");
     }
 
     // DIFFIE HELLMAN KEY GENERATION
