@@ -78,17 +78,17 @@ public class AuthService
 
     public boolean register(String username, String password, String[] rolesOrPerms)
     {
-        // if ( findUser( username ) )
-        //    return false;
+        if ( findUser( username ) )
+            return false;
 
         // Adding the user to the credentials
         Set<String> ropSet = new HashSet<>(Arrays.asList(rolesOrPerms));
         Logger.log("AuthService - Register", "Registering " + username + " with roles / permissions " + ropSet );
 
-        //IOHandler.append( DATABASE_FILE_CHANGED, (line) -> {
-        //    String hash = HashUtils.getFileHash(username, password);
-        //    return hash;
-        //});
+        IOHandler.append( DATABASE_FILE_CHANGED, (line) -> {
+            String hash = HashUtils.getFileHash(username, password);
+            return hash;
+        });
 
         // now adding it to the access control - we let the policy handle it
         return controlPolicy.register( username, ropSet );
@@ -101,7 +101,11 @@ public class AuthService
 
         Logger.log("AuthService - Unregister", "Unregistering " + username );
         // remove from credentials
-        boolean removedCredentials = IOHandler.readWrite( DATABASE_FILE_CHANGED, DATABASE_FILE_TEMP, username );
+        boolean removedCredentials = IOHandler.readWrite( DATABASE_FILE_CHANGED, DATABASE_FILE_TEMP, (line) -> {
+            String split[] = line.split(" ");
+            String hashedUsername = HashUtils.getHash(username, split[2]);
+            return split[0].contentEquals(hashedUsername);
+        } );
         // remove from access control - we let the policy handle it
         return removedCredentials && controlPolicy.unregister( username );
     }

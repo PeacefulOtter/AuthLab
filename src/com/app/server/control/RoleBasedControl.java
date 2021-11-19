@@ -42,9 +42,9 @@ public class RoleBasedControl implements Control {
 
 
     @Override
-    public Set<String> getPermissions(String username )
+    public Set<String> getPermissions( String username )
     {
-        return IOHandler.setRead( ROLES_CONTROL, (reader) -> {
+        return IOHandler.setRead( ROLES_CONTROL_CHANGED, (reader) -> {
             Set<String> userRoles = reader.lines()
                     // filter to only get the line where the username is
                     .filter(line -> {
@@ -60,6 +60,8 @@ public class RoleBasedControl implements Control {
                     } )
                     .flatMap(List::stream)
                     .collect(Collectors.toSet());
+
+            System.out.println(userRoles);
 
             return userRoles.stream()
                     .map(roles::get)

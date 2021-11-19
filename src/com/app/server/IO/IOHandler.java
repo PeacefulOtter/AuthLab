@@ -73,7 +73,7 @@ public class IOHandler
         return tempFile.renameTo(file);
     }
 
-    public static boolean readWrite(String origin, String temp, String removePart)
+    public static boolean readWrite(String origin, String temp, LineCallback callback)
     {
         File file = new File( "./res/" + origin );
         File tempFile = new File( "./res/" + temp );
@@ -84,12 +84,13 @@ public class IOHandler
             String currentLine;
             while ((currentLine = reader.readLine()) != null)
             {
-                String split[] = currentLine.split(" ");
-                if (split[0].contentEquals(removePart)) continue;
+                boolean remove = callback.call(currentLine);
+                if ( remove ) continue;
                 writer.write(currentLine + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
 
         return tempFile.renameTo(file);

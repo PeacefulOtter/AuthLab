@@ -13,11 +13,15 @@ public interface Control
 
     default boolean addUser( String username, Set<String> roles, String file)
     {
-        return IOHandler.append( file, (line) -> username + " " + roles.stream().reduce("", (a, b) -> b + " " + a) );
+        return IOHandler.append( file, (line) ->
+                username + " " + roles.stream().reduce("", (a, b) -> b + " " + a) );
     }
 
     default boolean removeUser( String username, String origin, String temp )
     {
-        return IOHandler.readWrite( origin, temp, username );
+        return IOHandler.readWrite( origin, temp, (line) -> {
+            String[] split = line.split(" ");
+            return split[0].contentEquals(username);
+        } );
     }
 }

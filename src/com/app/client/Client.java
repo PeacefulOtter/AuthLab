@@ -28,19 +28,28 @@ public class Client
 
     public static void main(String[] args) throws MalformedURLException, NotBoundException, RemoteException
     {
+        String username = args[0];
+        String password = args[1];
+
         Remote remote = Naming.lookup("rmi://" + Settings.HOSTNAME + "/" + Settings.SUBDOMAIN );
         RemoteServer server = (RemoteServer) remote;
 
         Client client = new Client(server);
-        // int symKey = client.getSymKey(); // create diffie-hellman symmetric key
+        String printer = "My Printer";
 
-        String username = args[0];
-        String password = args[1];
-        System.out.println(username);
-        System.out.println(password);
+        // not authenticated
+        String res = server.queue(UUID.randomUUID(), username, printer);
+        System.out.println(res);
+
         UUID sessionID = client.login(username, password);
 
-        server.print(sessionID, username, "file.txt", "MyPrinter");
+        // use the print method
+        res = server.print(sessionID, username, "file.txt", printer);
+        System.out.println(res);
+
+        // does not have access to the status command
+        res = server.status(sessionID, username, printer);
+        System.out.println(res);
     }
 
     // DIFFIE HELLMAN KEY GENERATION

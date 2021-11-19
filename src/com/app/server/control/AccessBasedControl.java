@@ -13,13 +13,13 @@ public class AccessBasedControl implements Control {
     @Override
     public Set<String> getPermissions(String username)
     {
-        return IOHandler.setRead( ACCESS_CONTROL, (reader) -> {
+        return IOHandler.setRead( ACCESS_CONTROL_CHANGED, (reader) -> {
             List<String> filteredLines = reader.lines()
                     // filter to only get the line where the username is
                     .filter(line -> {
                         String[] split = line.split( " " );
-                        String lineUsername = split[0];
-                        return lineUsername.contentEquals(username);
+                        System.out.println(split[0] + " " + username + " " + split[0].contentEquals(username));
+                        return split[0].contentEquals(username);
                     }).collect(Collectors.toList());
 
             // we split that line by spaces, the first element is the username and the remaining are the permissions
@@ -31,7 +31,8 @@ public class AccessBasedControl implements Control {
 
     @Override
     public boolean changePermissions(String username, Set<String> rolesOrPerms) {
-        return IOHandler.readWriteReplace(ACCESS_CONTROL_CHANGED, ACCESS_CONTROL_TEMP, username, username + " " + rolesOrPerms.stream().reduce( "", (a, b) -> b + " " + a) );
+        return IOHandler.readWriteReplace(ACCESS_CONTROL_CHANGED, ACCESS_CONTROL_TEMP,
+                username, username + " " + rolesOrPerms.stream().reduce( "", (a, b) -> b + " " + a) );
     }
 
     @Override
