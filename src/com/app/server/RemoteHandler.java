@@ -25,7 +25,7 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
 
     private boolean isAuthenticated(UUID id)
     {
-        return sessions.containsKey(id);
+        return id != null && sessions.containsKey(id);
     }
 
     private boolean hasAccess( UUID id, String method )
@@ -123,6 +123,7 @@ public class RemoteHandler extends UnicastRemoteObject implements RemoteServer
     @Override
     public UUID login(String username, String password) throws RemoteException {
         Session session = authService.login(username, password);
+        if ( session == null ) return null;
         sessions.put(session.getId(), session.getSessionPermissions());
         return session.getId();
     }
